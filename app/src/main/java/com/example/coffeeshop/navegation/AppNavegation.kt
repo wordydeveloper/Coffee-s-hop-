@@ -5,7 +5,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.coffeeshop.MainScreen
-import com.example.coffeeshop.ui.theme.splasScreen
+import com.example.coffeeshop.ui.theme.splashScreen
+
 
 @Composable
 fun AppNavegation(){
@@ -14,7 +15,7 @@ fun AppNavegation(){
         startDestination = AppScreen.splasScren.route
         ){
         composable(AppScreen.splasScren.route){
-            splasScreen(navController)
+            splashScreen(navController)
         }
 
         composable(AppScreen.MainScreen.route){

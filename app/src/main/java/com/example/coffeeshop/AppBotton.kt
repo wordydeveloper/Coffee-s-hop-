@@ -1,6 +1,5 @@
 package com.example.coffeeshop
 
-import androidx.compose.foundation.MutatePriority
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
@@ -8,8 +7,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 
@@ -43,9 +40,9 @@ val TopLevelDestination = listOf(
         IconText =R.string.search
     ),
     AppToplevel(
-        route =AppRoute.SETTINGS ,
+        route =AppRoute.SHOPPINGCART ,
         selecIcon = Icons.Default.ShoppingCart,
-        IconText =R.string.settings
+        IconText =R.string.shoppingCart
     ),
     AppToplevel(
         route =AppRoute.FAVORITE ,
@@ -60,9 +57,10 @@ val TopLevelDestination = listOf(
 
     )
 object AppRoute{
-     const val HOME ="home"
+    const val SPLASH = "splash"
+    const val HOME ="home"
     const val SEARCH ="search"
-    const val SETTINGS =" settings"
+    const val SHOPPINGCART =" shoppingCart"
     const val PROFILE =" profile"
     const val FAVORITE =" favorite"
 

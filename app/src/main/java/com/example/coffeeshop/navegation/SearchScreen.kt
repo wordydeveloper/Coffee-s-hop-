@@ -12,21 +12,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.coffeeshop.R
-
-data class Coffee(val imageRes: Int, val name: String, val description: String)
+import androidx.navigation.NavController
+import com.example.coffeeshop.AppRoute
+import com.example.coffeeshop.ui.theme.coffeeList
 
 @Composable
-fun SearchScreen() {
-    val coffeeList = listOf(
-        Coffee(R.drawable.i1, "Expreso", "Café concentrado con sabor intenso."),
-        Coffee(R.drawable.i2, "Americano", "Café negro diluido en agua caliente."),
-        Coffee(R.drawable.i3, "Crema", "Café suave con textura espumosa."),
-        Coffee(R.drawable.ii5, "Negro", "El clásico café sin aditivos."),
-        Coffee(R.drawable.i6, "Americano", "Otra variante americana sin leche."),
-        Coffee(R.drawable.ii7, "Frío", "Café frío ideal para días calurosos.")
-    )
-
+fun SearchScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
 
     val matchedItem = coffeeList.firstOrNull {
@@ -88,11 +79,29 @@ fun SearchScreen() {
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Precio: ${coffee.price}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Button(onClick = { ShoppingCart.add(coffee) }) {
+                        Text("Agregar al carrito")
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
                 }
             } ?: Text(
                 text = "No se encontró un café con ese nombre ☕",
                 style = MaterialTheme.typography.bodyMedium
             )
+            Button(onClick = { navController.navigate(AppRoute.SHOPPINGCART) }) {
+                Text("Ver carrito")
+            }
         }
     }
 }

@@ -40,6 +40,8 @@ android {
 }
 
 dependencies {
+    implementation(platform("androidx.compose:compose-bom:2025.01.01"))
+    implementation("androidx.compose.material3:material3")
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
