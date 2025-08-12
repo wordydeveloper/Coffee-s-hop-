@@ -19,7 +19,7 @@ fun AppNavegation(){
         }
 
         composable(AppScreen.MainScreen.route){
-   MainScreen()
+   MainScreen( navController)
         }
     }
 }
