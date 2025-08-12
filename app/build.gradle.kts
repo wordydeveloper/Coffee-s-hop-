@@ -2,8 +2,11 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("org.jetbrains.kotlin.kapt")
 }
-
+kapt {
+    correctErrorTypes = true
+}
 android {
     namespace = "com.example.coffeeshop"
     compileSdk = 35
@@ -40,6 +43,17 @@ android {
 }
 
 dependencies {
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
+
+    // Coroutines (NECESARIO para que kapt conozca Flow)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+    implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
     implementation(platform("androidx.compose:compose-bom:2025.01.01"))
     implementation("androidx.compose.material3:material3")
     implementation(libs.androidx.navigation.compose)

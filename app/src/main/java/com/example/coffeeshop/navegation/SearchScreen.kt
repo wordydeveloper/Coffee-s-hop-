@@ -15,10 +15,21 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.coffeeshop.AppRoute
 import com.example.coffeeshop.ui.theme.coffeeList
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.coffeeshop.viewmodel.FavoriteViewModel
 
 @Composable
 fun SearchScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
+
+    // VM y estado de favoritos (Room)
+    val favVm: FavoriteViewModel = viewModel()
+    val favorites by favVm.favorites.collectAsState()
 
     val matchedItem = coffeeList.firstOrNull {
         it.name.contains(searchQuery.trim(), ignoreCase = true)
@@ -48,10 +59,7 @@ fun SearchScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(24.dp))
 
         if (searchQuery.isEmpty()) {
-            Text(
-                "Ingresa el nombre de un café para buscarlo.",
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Text("Ingresa el nombre de un café para buscarlo.", style = MaterialTheme.typography.bodyMedium)
         } else {
             matchedItem?.let { coffee ->
                 Column(
@@ -67,12 +75,32 @@ fun SearchScreen(navController: NavController) {
                             .clip(RoundedCornerShape(16.dp)),
                         contentScale = ContentScale.Crop
                     )
+
                     Spacer(modifier = Modifier.height(10.dp))
-                    Text(
-                        text = coffee.name,
-                        fontSize = 24.sp,
-                        style = MaterialTheme.typography.headlineSmall
-                    )
+
+                    // Título + botón de favorito
+                    val isFav = favorites.any { it.coffeeName == coffee.name }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = coffee.name,
+                            fontSize = 24.sp,
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+                        IconButton(onClick = { favVm.toggleFavorite(coffee.name) }) {
+                            if (isFav) {
+                                Icon(Icons.Filled.Favorite, contentDescription = "Quitar de favoritos")
+                            } else {
+                                Icon(Icons.Outlined.FavoriteBorder, contentDescription = "Agregar a favoritos")
+                            }
+                        }
+                    }
+
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = coffee.description,
@@ -93,12 +121,10 @@ fun SearchScreen(navController: NavController) {
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
-
                 }
-            } ?: Text(
-                text = "No se encontró un café con el nombre proporcionado  ☕",
-                style = MaterialTheme.typography.bodyMedium
-            )
+            } ?: Text("No se encontró un café con ese nombre ☕", style = MaterialTheme.typography.bodyMedium)
+
+            Spacer(Modifier.height(12.dp))
             Button(onClick = { navController.navigate(AppRoute.SHOPPINGCART) }) {
                 Text("Ver carrito")
             }

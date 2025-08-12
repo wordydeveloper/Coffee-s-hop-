@@ -19,13 +19,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.coffeeshop.AppRoute
 import com.example.coffeeshop.R
-import com.example.coffeeshop.navegation.AppScreen
+
 import kotlinx.coroutines.delay
 import java.text.BreakIterator
 import java.text.StringCharacterIterator

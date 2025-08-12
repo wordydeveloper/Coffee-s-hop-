@@ -75,10 +75,10 @@ fun MyAppContent(
                     CartScreen()
                 }
                 composable(AppRoute.FAVORITE) {
-                   favoriteScreen()
+                    favoriteScreen()
                 }
                 composable(AppRoute.PROFILE) {
-                   profileScreen()
+                    profileScreen()
                 }
             }
 

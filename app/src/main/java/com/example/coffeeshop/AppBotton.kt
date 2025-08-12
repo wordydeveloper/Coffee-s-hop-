@@ -17,8 +17,8 @@ class MyAppNavigationActions(private val navController: NavHostController){
         navController.navigate(destination.route){
             popUpTo(navController.graph.findStartDestination().id){
                 saveState =true
-        }
-        launchSingleTop= true
+            }
+            launchSingleTop= true
         }
     }
 }
@@ -26,7 +26,7 @@ data class AppToplevel (
     val route:String,
     val selecIcon : ImageVector,
     val IconText:Int
-    )
+)
 
 val TopLevelDestination = listOf(
     AppToplevel(
@@ -56,12 +56,11 @@ val TopLevelDestination = listOf(
     ),
 
     )
-object AppRoute{
+object AppRoute {
     const val SPLASH = "splash"
-    const val HOME ="home"
-    const val SEARCH ="search"
-    const val SHOPPINGCART =" shoppingCart"
-    const val PROFILE =" profile"
-    const val FAVORITE =" favorite"
-
+    const val HOME = "home"
+    const val SEARCH = "search"
+    const val SHOPPINGCART = "shoppingCart"
+    const val PROFILE = "profile"
+    const val FAVORITE = "favorite"
 }
