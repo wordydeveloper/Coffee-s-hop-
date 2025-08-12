@@ -96,7 +96,7 @@ fun SearchScreen(navController: NavController) {
 
                 }
             } ?: Text(
-                text = "No se encontró un café con ese nombre ☕",
+                text = "No se encontró un café con el nombre proporcionado  ☕",
                 style = MaterialTheme.typography.bodyMedium
             )
             Button(onClick = { navController.navigate(AppRoute.SHOPPINGCART) }) {
