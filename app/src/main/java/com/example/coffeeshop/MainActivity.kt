@@ -65,8 +65,9 @@ fun MyAppContent(
                 }
 
                 composable(AppRoute.HOME) {
-                    MainScreen()
+                    MainScreen(navController = navController)
                 }
+
                 composable(AppRoute.SEARCH) {
                     SearchScreen(navController = navController)
                 }
