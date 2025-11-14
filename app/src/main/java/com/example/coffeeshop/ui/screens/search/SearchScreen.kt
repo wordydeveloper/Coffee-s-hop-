@@ -1,4 +1,4 @@
-package com.example.coffeeshop.navegation
+package com.example.coffeeshop.ui.screens.search
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -14,13 +14,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.coffeeshop.AppRoute
-import com.example.coffeeshop.ui.theme.coffeeList
+import com.example.coffeeshop.ui.ui.coffeeList
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.coffeeshop.navegation.ShoppingCart
 import com.example.coffeeshop.viewmodel.FavoriteViewModel
 
 @Composable

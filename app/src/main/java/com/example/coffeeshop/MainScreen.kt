@@ -27,8 +27,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.coffeeshop.ui.theme.Coffee
-import com.example.coffeeshop.ui.theme.coffeeList
+import com.example.coffeeshop.ui.ui.Coffee
+import com.example.coffeeshop.ui.ui.coffeeList
 import com.example.coffeeshop.viewmodel.OrderViewModel
 
 @Composable

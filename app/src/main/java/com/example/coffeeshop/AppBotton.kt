@@ -63,4 +63,6 @@ object AppRoute {
     const val SHOPPINGCART = "shoppingCart"
     const val PROFILE = "profile"
     const val FAVORITE = "favorite"
+    const val LOGIN = "login"
+
 }

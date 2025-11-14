@@ -23,7 +23,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.coffeeshop.ui.theme.Coffee
+import com.example.coffeeshop.ui.ui.Coffee
 import com.example.coffeeshop.viewmodel.OrderViewModel
 
 // -----------------------------
@@ -42,102 +42,4 @@ object ShoppingCart {
 }
 
 // -----------------------------
-// Pantalla del carrito + pedidos
-// -----------------------------
-@Composable
-fun CartScreen() {
-    val vm: OrderViewModel = viewModel()
 
-    // Carrito (memoria)
-    val cartItems = ShoppingCart.items
-    val total = ShoppingCart.getTotal()
-
-    // Pedidos desde Room (flujo del ViewModel)
-    val orders by vm.orders.collectAsState(initial = emptyList())
-
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-
-        // ===== Carrito =====
-        Text("Carrito", style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(8.dp))
-
-        if (cartItems.isEmpty()) {
-            Text("Tu carrito está vacío.")
-        } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                items(cartItems) { coffee ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Column {
-                            Text(coffee.name, style = MaterialTheme.typography.titleMedium)
-                            Text(coffee.price)
-                        }
-                        Button(onClick = { ShoppingCart.remove(coffee) }) {
-                            Text("Quitar")
-                        }
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(16.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("Total: $${String.format("%.2f", total)}")
-                Button(onClick = {
-                    cartItems.forEach { coffee ->
-                        vm.placeOrder(coffee.name, 1, "")
-                    }
-                    ShoppingCart.clear()
-                }) { Text("Realizar pedido") }
-            }
-        }
-
-        Spacer(Modifier.height(24.dp))
-        Divider()
-        Spacer(Modifier.height(12.dp))
-
-        // ===== Pedidos (Room) =====
-        Text("Mis pedidos", style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(8.dp))
-
-        if (orders.isEmpty()) {
-            Text("Aún no tienes pedidos.")
-        } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f, fill = false)
-            ) {
-                items(orders, key = { it.id }) { order ->
-                    ElevatedCard(Modifier.fillMaxWidth()) {
-                        Column(Modifier.fillMaxWidth().padding(12.dp)) {
-                            Text(order.coffeeName, style = MaterialTheme.typography.titleMedium)
-                            Text("Cantidad: ${order.quantity}")
-                            if (order.options.isNotBlank()) Text("Opciones: ${order.options}")
-                            Spacer(Modifier.height(6.dp))
-                            Text("Estado: ${order.status}")
-
-                            Spacer(Modifier.height(8.dp))
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Button(onClick = { vm.advanceStatus(order) }) { Text("Avanzar estado") }
-                                OutlinedButton(onClick = { vm.setStatus(order, "Pendiente") }) { Text("Pendiente") }
-                                OutlinedButton(onClick = { vm.setStatus(order, "Preparando") }) { Text("Preparando") }
-                                OutlinedButton(onClick = { vm.setStatus(order, "Listo para recoger") }) { Text("Listo") }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}

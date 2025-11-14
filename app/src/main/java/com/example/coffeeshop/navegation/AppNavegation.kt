@@ -5,7 +5,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.coffeeshop.MainScreen
-import com.example.coffeeshop.ui.theme.splashScreen
+import com.example.coffeeshop.ui.screens.cart.CartScreen
+import com.example.coffeeshop.ui.screens.search.SearchScreen
+import com.example.coffeeshop.ui.ui.splashScreen
 
 @Composable
 fun AppNavegation() {

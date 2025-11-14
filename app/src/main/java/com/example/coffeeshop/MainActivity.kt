@@ -9,16 +9,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
-import com.example.coffeeshop.navegation.CartScreen
-import com.example.coffeeshop.navegation.SearchScreen
+import com.example.coffeeshop.ui.screens.search.SearchScreen
 import com.example.coffeeshop.navegation.favoriteScreen
 import com.example.coffeeshop.navegation.profileScreen
-import com.example.coffeeshop.navegation.ShoppingCart
-import com.example.coffeeshop.ui.theme.CoffeeshopTheme
-import com.example.coffeeshop.ui.theme.splashScreen
+import com.example.coffeeshop.ui.screens.cart.CartScreen
+import com.example.coffeeshop.ui.ui.CoffeeshopTheme
+import com.example.coffeeshop.ui.ui.splashScreen
+
+
 
 
 class MainActivity : ComponentActivity() {
@@ -39,6 +39,7 @@ class MainActivity : ComponentActivity() {
                     navController = navController,
                     seletedDestination = selectedDestination,
                     navegateTopLevelDestination = navigationActions::navigateto
+
                 )
             }
         }
@@ -79,6 +80,9 @@ fun MyAppContent(
                 }
                 composable(AppRoute.PROFILE) {
                     profileScreen()
+                }
+                composable (AppRoute.LOGIN){
+
                 }
             }
 
