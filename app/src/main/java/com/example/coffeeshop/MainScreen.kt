@@ -39,15 +39,18 @@ fun MainScreen(navController: NavController) {
     // Lista de cafés
     LazyColumn(
         modifier = Modifier
+
             .fillMaxSize()
-            .padding(12.dp)
+            .padding(12.dp),
+
+
     ) {
         items(coffeeList) { coffee ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { selectedCoffee = coffee }
-                    .padding(vertical = 12.dp),
+                    .padding(vertical = 12.dp , horizontal = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
@@ -82,6 +85,7 @@ fun MainScreen(navController: NavController) {
         var addMilk by remember { mutableStateOf(false) }
 
         AlertDialog(
+          // desplazar el dialogo  modifier = Modifier.offset( y= 48.dp),
             onDismissRequest = { selectedCoffee = null },
             title = { Text(coffee.name) },
             text = {
@@ -95,6 +99,7 @@ fun MainScreen(navController: NavController) {
                             .height(200.dp)
                             .clip(RoundedCornerShape(16.dp)),
                         contentScale = ContentScale.Crop
+                        
                     )
 
                     Spacer(Modifier.height(8.dp))

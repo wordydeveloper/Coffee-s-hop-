@@ -45,7 +45,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
 @Composable
 fun MyAppContent(
     modifier: Modifier,
@@ -53,45 +52,41 @@ fun MyAppContent(
     seletedDestination: String,
     navegateTopLevelDestination: (AppToplevel) -> Unit
 ) {
-    Row(modifier = modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            NavHost(
-                modifier = Modifier.weight(1f),
-                navController = navController,
-                startDestination = AppRoute.SPLASH
-            ) {
-                // SplashScreen
-                composable(AppRoute.SPLASH) {
-                    splashScreen(navController)
-                }
-
-                composable(AppRoute.HOME) {
-                    MainScreen(navController = navController)
-                }
-
-                composable(AppRoute.SEARCH) {
-                    SearchScreen(navController = navController)
-                }
-                composable(AppRoute.SHOPPINGCART) {
-                    CartScreen()
-                }
-                composable(AppRoute.FAVORITE) {
-                    favoriteScreen()
-                }
-                composable(AppRoute.PROFILE) {
-                    profileScreen()
-                }
-                composable (AppRoute.LOGIN){
-
-                }
-            }
-
-            // Barra inferior de navegación
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        bottomBar = {
             if (seletedDestination != AppRoute.SPLASH) {
                 ComposePreview(
                     seletedDestination = seletedDestination,
                     navegateTopLevelDestination = navegateTopLevelDestination
                 )
+            }
+        }
+    ) { paddingValues ->
+        NavHost(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            navController = navController,
+            startDestination = AppRoute.SPLASH
+        ) {
+            composable(AppRoute.SPLASH) {
+                splashScreen(navController)
+            }
+            composable(AppRoute.HOME) {
+                MainScreen(navController = navController)
+            }
+            composable(AppRoute.SEARCH) {
+                SearchScreen(navController = navController)
+            }
+            composable(AppRoute.SHOPPINGCART) {
+                CartScreen()
+            }
+            composable(AppRoute.FAVORITE) {
+                favoriteScreen()
+            }
+            composable(AppRoute.PROFILE) {
+                profileScreen()
             }
         }
     }
