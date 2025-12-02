@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
   id("org.jetbrains.kotlin.kapt")
+    alias(libs.plugins.google.services)
 }
 
 kapt {
@@ -47,16 +48,23 @@ android {
 }
 
 dependencies {
-    // 🔥 Firebase
-   // implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
-   // implementation("com.google.firebase:firebase-analytics")
-   // implementation("com.google.firebase:firebase-auth-ktx")
-   // implementation("com.google.firebase:firebase-firestore")
-  //  implementation("com.google.firebase:firebase-storage")
+    // Add these for the new code to work:
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.firebase:firebase-firestore")
+
+    // 3. Las otras librerías (TAMBIÉN SIN NÚMERO)
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-messaging")
 
     // 🗄️ Room
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
+    implementation(libs.firebase.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
+    implementation(libs.firebase.crashlytics.buildtools)
+    implementation(libs.firebase.firestore.ktx)
     kapt("androidx.room:room-compiler:2.6.1")
 
     // ⚙️ Coroutines
