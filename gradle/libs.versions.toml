@@ -11,6 +11,15 @@ composeBom = "2024.09.00"
 navigation = "2.7.7"
 benchmarkMacro = "1.3.4"
 googleServiceVersion = "4.4.2"
+<<<<<<< Updated upstream
+=======
+firebaseAuth = "24.0.1"
+credentials = "1.5.0"
+credentialsPlayServicesAuth = "1.5.0"
+googleid = "1.1.1"
+firebaseCrashlyticsBuildtools = "3.0.6"
+firebaseFirestoreKtx = "25.1.4"
+>>>>>>> Stashed changes
 
 [libraries]
 # AndroidX
