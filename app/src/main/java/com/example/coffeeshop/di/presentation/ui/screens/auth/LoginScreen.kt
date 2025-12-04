@@ -44,7 +44,25 @@ fun LoginScreen(navController: NavController) {
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
-    // Google Sign-In
+    // ✅ Configuramos GoogleSignInOptions y Client una sola vez
+    val gso = remember {
+        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(context.getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+    }
+
+    val googleSignInClient = remember {
+        GoogleSignIn.getClient(context, gso)
+    }
+
+    // ✅ Forzamos logout de Google al entrar a la pantalla
+    // para que SIEMPRE muestre el selector de cuenta
+    LaunchedEffect(Unit) {
+        googleSignInClient.signOut()
+    }
+
+    // Google Sign-In launcher
     val googleSignInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -54,11 +72,15 @@ fun LoginScreen(navController: NavController) {
             val credential = GoogleAuthProvider.getCredential(account.idToken, null)
             viewModel.loginWithGoogle(credential)
         } catch (e: ApiException) {
-            Toast.makeText(context, "Google Sign-In failed: ${e.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                context,
+                "Google Sign-In failed: ${e.message}",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
-    // Observer de eventos
+    // Observer de eventos de Auth (navegación / toasts)
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
@@ -167,11 +189,6 @@ fun LoginScreen(navController: NavController) {
             // Google Sign-In Button
             OutlinedButton(
                 onClick = {
-                    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestIdToken(context.getString(R.string.default_web_client_id))
-                        .requestEmail()
-                        .build()
-                    val googleSignInClient = GoogleSignIn.getClient(context, gso)
                     googleSignInLauncher.launch(googleSignInClient.signInIntent)
                 },
                 modifier = Modifier
