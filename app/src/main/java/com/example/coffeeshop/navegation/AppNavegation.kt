@@ -7,12 +7,12 @@ import androidx.navigation.compose.rememberNavController
 import com.example.coffeeshop.MainScreen
 import com.example.coffeeshop.di.presentation.ui.screens.cart.CartScreen
 import com.example.coffeeshop.di.presentation.ui.screens.search.SearchScreen
-
 import com.example.coffeeshop.ui.ui.splashScreen
 
 @Composable
 fun AppNavegation() {
     val navController = rememberNavController()
+
     NavHost(
         navController = navController,
         startDestination = AppScreen.splasScren.route
@@ -23,7 +23,6 @@ fun AppNavegation() {
         composable(AppScreen.MainScreen.route) {
             MainScreen(navController)
         }
-        // 👇 Añadir todas las demás pantallas
         composable(AppScreen.ShoppingCart.route) {
             CartScreen()
         }
@@ -34,7 +33,8 @@ fun AppNavegation() {
             favoriteScreen()
         }
         composable("profile") {
-            profileScreen()
+
+            profileScreen(navController = navController)
         }
     }
 }

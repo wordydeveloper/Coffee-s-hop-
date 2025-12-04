@@ -48,30 +48,29 @@ android {
 }
 
 dependencies {
-    // LiveData + Compose (para usar observeAsState con LiveData)
+    // LiveData + Compose
     implementation("androidx.compose.runtime:runtime-livedata")
 
     // =========================
     // 🔥 Firebase + Google Sign-In
     // =========================
-
-    // BOM de Firebase (maneja versiones por ti)
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
 
-    // Firebase Auth, Firestore y Messaging (con KTX)
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-messaging-ktx")
 
-    // Google Sign-In clásico (GoogleSignIn / GoogleSignInOptions)
     implementation("com.google.android.gms:play-services-auth:21.2.0")
 
-    // Credentials API & Google ID (si luego quieres usar el sistema nuevo)
+    // Coroutines para Tasks de Firebase (await())
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
+
+    // Credentials API & Google ID
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
 
-    // Crashlytics buildtools (si lo usas para simbolización, etc.)
+    // Crashlytics buildtools
     implementation(libs.firebase.crashlytics.buildtools)
 
     // =========================
@@ -90,16 +89,11 @@ dependencies {
     // =========================
     // 🎨 Jetpack Compose
     // =========================
-
-    // Usa SOLO el BOM definido en libs.versions.toml
     implementation(platform(libs.androidx.compose.bom))
-
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-
-    // Material icons extendidos
     implementation("androidx.compose.material:material-icons-extended")
 
     // =========================

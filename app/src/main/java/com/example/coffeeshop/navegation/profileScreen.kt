@@ -8,15 +8,28 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.coffeeshop.viewmodel.OrderViewModel
 
 @Composable
-fun profileScreen() {
+fun profileScreen(
+    navController: NavHostController   // ✅ ahora recibe navController
+) {
     val orderViewModel: OrderViewModel = viewModel()
     val orders by orderViewModel.orders.collectAsState()
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Text("Mi perfil", style = MaterialTheme.typography.headlineMedium)
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text(
+            "Mi perfil",
+            style = MaterialTheme.typography.headlineMedium
+        )
+
         Spacer(Modifier.height(8.dp))
+
         if (orders.isEmpty()) {
             Text("No has realizado pedidos todavía.")
         } else {
@@ -29,9 +42,18 @@ fun profileScreen() {
                         colors = CardDefaults.elevatedCardColors()
                     ) {
                         Column(modifier = Modifier.padding(12.dp)) {
-                            Text("${order.coffeeName} x${order.quantity}", style = MaterialTheme.typography.bodyLarge)
-                            Text("Opciones: ${order.options}", style = MaterialTheme.typography.bodyMedium)
-                            Text("Estado: ${order.status}", style = MaterialTheme.typography.bodyMedium)
+                            Text(
+                                "${order.coffeeName} x${order.quantity}",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                "Opciones: ${order.options}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                "Estado: ${order.status}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
                         }
                     }
                 }

@@ -1,11 +1,22 @@
 package com.example.coffeeshop.di.presentation.ui.screens.cart
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.example.coffeeshop.data.model.Order
+import com.example.coffeeshop.data.model.OrderStatus
+import com.example.coffeeshop.di.AppModule
+import com.example.coffeeshop.domain.usecase.cart.ClearCartUseCase
+import com.example.coffeeshop.domain.usecase.cart.GetCartItemsUseCase
+import com.example.coffeeshop.domain.usecase.cart.GetCartTotalUseCase
+import com.example.coffeeshop.domain.usecase.cart.RemoveFromCartUseCase
+import com.example.coffeeshop.domain.usecase.order.GetAllOrdersUseCase
+import com.example.coffeeshop.domain.usecase.order.PlaceOrderUseCase
+import com.example.coffeeshop.domain.usecase.order.UpdateOrderStatusUseCase
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+
+private const val TAG = "CartViewModel"
 
 data class CartItem(
     val id: String = "",
@@ -22,78 +33,84 @@ sealed class CartUiState {
     object Loading : CartUiState()
     data class Success(
         val items: List<CartItem>,
-        val total: Double
+        val total: Double,
+        val orders: List<Order>
     ) : CartUiState()
     object Empty : CartUiState()
     data class Error(val message: String) : CartUiState()
 }
 
-class CartViewModel : ViewModel() {
+class CartViewModel(
+    private val getCartItemsUseCase: GetCartItemsUseCase = AppModule.getCartItemsUseCase,
+    private val getCartTotalUseCase: GetCartTotalUseCase = AppModule.getCartTotalUseCase,
+    private val removeFromCartUseCase: RemoveFromCartUseCase = AppModule.removeFromCartUseCase,
+    private val clearCartUseCase: ClearCartUseCase = AppModule.clearCartUseCase,
+    private val placeOrderUseCase: PlaceOrderUseCase = AppModule.placeOrderUseCase,
+    private val getAllOrdersUseCase: GetAllOrdersUseCase = AppModule.getAllOrdersUseCase,
+    private val updateOrderStatusUseCase: UpdateOrderStatusUseCase = AppModule.updateOrderStatusUseCase
+) : ViewModel() {
 
-    // Estado interno (privado)
-    private val _items = MutableStateFlow<List<CartItem>>(emptyList())
-    val items: StateFlow<List<CartItem>> = _items.asStateFlow()
-
-    private val _total = MutableStateFlow(0.0)
-    val total: StateFlow<Double> = _total.asStateFlow()
-
-    private val _uiState = MutableStateFlow<CartUiState>(CartUiState.Empty)
+    private val _uiState = MutableStateFlow<CartUiState>(CartUiState.Loading)
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
 
-    // Agregar al carrito
-    fun addItem(item: CartItem) {
+    init {
+        loadCart()
+    }
+
+    private fun loadCart() {
         viewModelScope.launch {
             try {
-                val currentItems = _items.value.toMutableList()
-                val existingIndex = currentItems.indexOfFirst { it.id == item.id }
-
-                if (existingIndex != -1) {
-                    // Si ya existe, incrementar cantidad
-                    val existing = currentItems[existingIndex]
-                    currentItems[existingIndex] = existing.copy(
-                        quantity = existing.quantity + item.quantity
-                    )
-                } else {
-                    // Si no existe, agregar nuevo
-                    currentItems.add(item)
+                Log.d(TAG, "Cargando carrito y pedidos...")
+                combine(
+                    getCartItemsUseCase(),
+                    getCartTotalUseCase(),
+                    getAllOrdersUseCase()
+                ) { cartItems, total, orders ->
+                    if (cartItems.isEmpty() && orders.isEmpty()) {
+                        CartUiState.Empty
+                    } else {
+                        CartUiState.Success(
+                            items = cartItems.map { it.toCartItem() },
+                            total = total,
+                            orders = orders
+                        )
+                    }
+                }.collect { state ->
+                    _uiState.value = state
                 }
-
-                _items.value = currentItems
-                updateTotal()
-                updateUiState()
             } catch (e: Exception) {
-                _uiState.value = CartUiState.Error("Error al agregar item: ${e.message}")
+                Log.e(TAG, "Error al cargar el carrito", e)
+                _uiState.value =
+                    CartUiState.Error("Error al cargar el carrito: ${e.message}")
             }
         }
     }
 
-    // Quitar del carrito por ID
     fun removeItem(itemId: String) {
         viewModelScope.launch {
             try {
-                _items.value = _items.value.filter { it.id != itemId }
-                updateTotal()
-                updateUiState()
+                val currentState = _uiState.value
+                if (currentState is CartUiState.Success) {
+                    val itemToRemove = currentState.items.find { it.id == itemId }
+                    if (itemToRemove != null) {
+                        val coffee = com.example.coffeeshop.data.model.Coffee(
+                            id = itemToRemove.id,
+                            imageRes = 0, // No necesitamos la imagen
+                            name = itemToRemove.name,
+                            description = "",
+                            price = itemToRemove.price
+                        )
+                        removeFromCartUseCase(coffee)
+                    }
+                }
             } catch (e: Exception) {
-                _uiState.value = CartUiState.Error("Error al eliminar item: ${e.message}")
+                Log.e(TAG, "Error al eliminar del carrito", e)
+                _uiState.value =
+                    CartUiState.Error("Error al eliminar: ${e.message}")
             }
         }
     }
 
-    // Quitar del carrito por nombre (compatibilidad)
-    fun removeItemByName(name: String) {
-        viewModelScope.launch {
-            try {
-                _items.value = _items.value.filter { it.name != name }
-                updateTotal()
-                updateUiState()
-            } catch (e: Exception) {
-                _uiState.value = CartUiState.Error("Error al eliminar item: ${e.message}")
-            }
-        }
-    }
-
-    // Actualizar cantidad de un item
     fun updateQuantity(itemId: String, newQuantity: Int) {
         viewModelScope.launch {
             try {
@@ -102,68 +119,114 @@ class CartViewModel : ViewModel() {
                     return@launch
                 }
 
-                _items.value = _items.value.map { item ->
-                    if (item.id == itemId) {
-                        item.copy(quantity = newQuantity)
-                    } else {
-                        item
+                val currentState = _uiState.value
+                if (currentState is CartUiState.Success) {
+                    val item = currentState.items.find { it.id == itemId }
+                    if (item != null) {
+                        val cartItem = com.example.coffeeshop.data.model.CartItem(
+                            coffee = com.example.coffeeshop.data.model.Coffee(
+                                id = item.id,
+                                imageRes = 0,
+                                name = item.name,
+                                description = "",
+                                price = item.price
+                            ),
+                            quantity = newQuantity,
+                            addSugar = item.options.contains("azúcar"),
+                            addMilk = item.options.contains("leche")
+                        )
+                        // Actualizar usando el repositorio directamente
+                        AppModule.cartRepository.updateCartItem(cartItem)
                     }
                 }
-                updateTotal()
-                updateUiState()
             } catch (e: Exception) {
-                _uiState.value = CartUiState.Error("Error al actualizar cantidad: ${e.message}")
+                Log.e(TAG, "Error al actualizar cantidad", e)
+                _uiState.value =
+                    CartUiState.Error("Error al actualizar: ${e.message}")
             }
         }
     }
 
-    // Vaciar carrito
-    fun clearCart() {
+    fun checkout() {
         viewModelScope.launch {
             try {
-                _items.value = emptyList()
-                _total.value = 0.0
-                _uiState.value = CartUiState.Empty
+                val currentState = _uiState.value
+                if (currentState !is CartUiState.Success || currentState.items.isEmpty()) {
+                    Log.w(TAG, "checkout() llamado sin items en el carrito")
+                    return@launch
+                }
+
+                Log.d(TAG, "Iniciando checkout con ${currentState.items.size} items")
+
+                currentState.items.forEach { item ->
+                    val options = if (item.options.isNotEmpty()) {
+                        item.options.joinToString(", ")
+                    } else {
+                        ""
+                    }
+
+                    Log.d(
+                        TAG,
+                        "Creando pedido en Firebase: ${item.name} x${item.quantity} [$options]"
+                    )
+
+                    placeOrderUseCase(
+                        coffeeName = item.name,
+                        quantity = item.quantity,
+                        options = options
+                    )
+                }
+
+                // Limpiar el carrito local
+                clearCartUseCase()
+                Log.d(TAG, "Carrito limpiado después de checkout")
+
             } catch (e: Exception) {
-                _uiState.value = CartUiState.Error("Error al vaciar carrito: ${e.message}")
+                Log.e(TAG, "Error en checkout", e)
+                _uiState.value =
+                    CartUiState.Error("Error al procesar el pedido: ${e.message}")
             }
         }
     }
 
-    // Obtener cantidad de items
-    fun getItemCount(): Int = _items.value.sumOf { it.quantity }
-
-    // Verificar si el carrito está vacío
-    fun isEmpty(): Boolean = _items.value.isEmpty()
-
-    // Actualizar el total
-    private fun updateTotal() {
-        _total.value = _items.value.sumOf { it.totalPrice }
-    }
-
-    // Actualizar el estado de UI
-    private fun updateUiState() {
-        _uiState.value = if (_items.value.isEmpty()) {
-            CartUiState.Empty
-        } else {
-            CartUiState.Success(
-                items = _items.value,
-                total = _total.value
-            )
+    fun advanceOrderStatus(order: Order) {
+        viewModelScope.launch {
+            try {
+                val nextStatus = when (order.status) {
+                    OrderStatus.PENDING -> OrderStatus.PREPARING
+                    OrderStatus.PREPARING -> OrderStatus.READY
+                    OrderStatus.READY -> return@launch // Ya está listo
+                }
+                updateOrderStatusUseCase(order.id, nextStatus)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error al avanzar estado", e)
+                _uiState.value =
+                    CartUiState.Error("Error al actualizar estado: ${e.message}")
+            }
         }
     }
 
-    // Función para aplicar descuentos (opcional)
-    fun applyDiscount(percentage: Double): Double {
-        val discount = _total.value * (percentage / 100)
-        return _total.value - discount
-    }
-
-    // Obtener resumen del carrito
-    fun getCartSummary(): String {
-        return buildString {
-            append("Total de items: ${getItemCount()}\n")
-            append("Total a pagar: $${String.format("%.2f", _total.value)}")
+    fun updateOrderStatus(order: Order, newStatus: OrderStatus) {
+        viewModelScope.launch {
+            try {
+                updateOrderStatusUseCase(order.id, newStatus)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error al actualizar estado manualmente", e)
+                _uiState.value =
+                    CartUiState.Error("Error al actualizar estado: ${e.message}")
+            }
         }
     }
+
+    // Mapper desde CartItem de dominio a CartItem de UI
+    private fun com.example.coffeeshop.data.model.CartItem.toCartItem() = CartItem(
+        id = coffee.id,
+        name = coffee.name,
+        price = coffee.price,
+        quantity = quantity,
+        options = buildList {
+            if (addSugar) add("azúcar")
+            if (addMilk) add("leche")
+        }
+    )
 }

@@ -44,25 +44,22 @@ fun LoginScreen(navController: NavController) {
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
-    // ✅ Configuramos GoogleSignInOptions y Client una sola vez
+    // Config Google
     val gso = remember {
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(context.getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
     }
-
     val googleSignInClient = remember {
         GoogleSignIn.getClient(context, gso)
     }
 
-    // ✅ Forzamos logout de Google al entrar a la pantalla
-    // para que SIEMPRE muestre el selector de cuenta
+    // 🔁 Siempre mostrar selector de cuenta Google
     LaunchedEffect(Unit) {
         googleSignInClient.signOut()
     }
 
-    // Google Sign-In launcher
     val googleSignInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -80,7 +77,7 @@ fun LoginScreen(navController: NavController) {
         }
     }
 
-    // Observer de eventos de Auth (navegación / toasts)
+    // Eventos de auth
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
@@ -106,7 +103,6 @@ fun LoginScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo
             Image(
                 painter = painterResource(id = R.drawable.imagen),
                 contentDescription = "Logo",
@@ -131,7 +127,6 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(Modifier.height(32.dp))
 
-            // Email Field
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
@@ -144,7 +139,6 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(Modifier.height(16.dp))
 
-            // Password Field
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
@@ -166,7 +160,6 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(Modifier.height(24.dp))
 
-            // Login Button
             Button(
                 onClick = { viewModel.login(email, password) },
                 modifier = Modifier
@@ -186,11 +179,8 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(Modifier.height(16.dp))
 
-            // Google Sign-In Button
             OutlinedButton(
-                onClick = {
-                    googleSignInLauncher.launch(googleSignInClient.signInIntent)
-                },
+                onClick = { googleSignInLauncher.launch(googleSignInClient.signInIntent) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
@@ -200,12 +190,10 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(Modifier.height(16.dp))
 
-            // Register Link
             TextButton(onClick = { navController.navigate(AppRoute.SIGNUP) }) {
                 Text("¿No tienes cuenta? Regístrate")
             }
 
-            // Error Message
             if (authState is AuthState.Error) {
                 Spacer(Modifier.height(16.dp))
                 Text(

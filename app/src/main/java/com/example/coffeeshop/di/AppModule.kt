@@ -1,9 +1,11 @@
 package com.example.coffeeshop.di
 
-
 import android.content.Context
 import com.example.coffeeshop.data.local.database.AppDatabase
-import com.example.coffeeshop.data.repository.*
+import com.example.coffeeshop.data.repository.AuthRepository
+import com.example.coffeeshop.data.repository.CartRepository
+import com.example.coffeeshop.data.repository.FavoriteRepository
+import com.example.coffeeshop.data.repository.FirebaseOrderRepository
 import com.example.coffeeshop.domain.repository.*
 import com.example.coffeeshop.domain.usecase.auth.*
 import com.example.coffeeshop.domain.usecase.cart.*
@@ -12,7 +14,7 @@ import com.example.coffeeshop.domain.usecase.order.*
 
 /**
  * Módulo de inyección de dependencias manual
- * (Si más adelante quieres usar Hilt/Dagger, puedes refactorizar esto)
+ * Ahora con soporte para Firebase en pedidos
  */
 object AppModule {
 
@@ -32,8 +34,10 @@ object AppModule {
         AuthRepository()
     }
 
+    // 🔥 Repositorio de pedidos basado en Firebase
     val orderRepository: IOrderRepository by lazy {
-        OrderRepository(orderDao)
+        // forzamos a que el Lazy sea de tipo IOrderRepository
+        FirebaseOrderRepository(orderDao) as IOrderRepository
     }
 
     val favoriteRepository: IFavoriteRepository by lazy {
@@ -78,6 +82,10 @@ object AppModule {
         UpdateOrderStatusUseCase(orderRepository)
     }
 
+    val getAllOrdersUseCase by lazy {
+        GetAllOrdersUseCase(orderRepository)
+    }
+
     // ===== CART USE CASES =====
     val addToCartUseCase by lazy {
         AddToCartUseCase(cartRepository)
@@ -85,6 +93,18 @@ object AppModule {
 
     val getCartTotalUseCase by lazy {
         GetCartTotalUseCase(cartRepository)
+    }
+
+    val getCartItemsUseCase by lazy {
+        GetCartItemsUseCase(cartRepository)
+    }
+
+    val removeFromCartUseCase by lazy {
+        RemoveFromCartUseCase(cartRepository)
+    }
+
+    val clearCartUseCase by lazy {
+        ClearCartUseCase(cartRepository)
     }
 
     // ===== FAVORITE USE CASES =====

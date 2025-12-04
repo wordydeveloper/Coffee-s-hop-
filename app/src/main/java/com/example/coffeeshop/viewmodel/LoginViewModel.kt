@@ -9,7 +9,7 @@ import com.example.coffeeshop.data.model.AuthState
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.messaging.FirebaseMessaging // Import required
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -28,7 +28,7 @@ class LoginViewModel : ViewModel() {
 
     fun login(email: String, password: String) {
         if (email.isBlank() || password.isBlank()) {
-            _loginState.value = AuthState.Error("Email or password can't be empty.")
+            _loginState.value = AuthState.Error("El email o contraseña no pueden estar vacíos")
             return
         }
 
@@ -38,10 +38,25 @@ class LoginViewModel : ViewModel() {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
-                    _loginState.value = AuthState.Authenticated(user!!)
-                    updateFcmToken()
+                    if (user != null) {
+                        _loginState.value = AuthState.Authenticated(user)
+                        updateFcmToken()
+
+                        // ✅ ENVIAR EVENTOS DE ÉXITO
+                        viewModelScope.launch {
+                            _events.send(AuthEvent.ShowToast("¡Inicio de sesión exitoso!"))
+                            _events.send(AuthEvent.Navigate("home"))
+                        }
+                    }
                 } else {
-                    _loginState.value = AuthState.Error(task.exception?.message ?: "Login failed")
+                    val errorMessage = when {
+                        task.exception?.message?.contains("password") == true ->
+                            "Contraseña incorrecta"
+                        task.exception?.message?.contains("user") == true ->
+                            "Usuario no encontrado"
+                        else -> task.exception?.message ?: "Error al iniciar sesión"
+                    }
+                    _loginState.value = AuthState.Error(errorMessage)
                 }
             }
     }
@@ -57,7 +72,9 @@ class LoginViewModel : ViewModel() {
                         checkIfUserExistsInFirestore(user)
                     }
                 } else {
-                    _loginState.value = AuthState.Error(task.exception?.message ?: "Google Login failed")
+                    _loginState.value = AuthState.Error(
+                        task.exception?.message ?: "Error con Google Sign-In"
+                    )
                 }
             }
     }
@@ -66,18 +83,18 @@ class LoginViewModel : ViewModel() {
         firestore.collection("users").document(user.uid).get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
-                    // Case 1: Returning User
+                    // Usuario existente
                     _loginState.value = AuthState.Authenticated(user)
                     updateFcmToken()
                     triggerSuccessEvents()
                 } else {
-                    // Case 2: New User
+                    // Usuario nuevo desde Google
                     val name = user.displayName ?: "Usuario Google"
                     saveGoogleUserToFirestore(user, name)
                 }
             }
             .addOnFailureListener {
-                _loginState.value = AuthState.Error("Error connecting to database")
+                _loginState.value = AuthState.Error("Error al conectar con la base de datos")
             }
     }
 
@@ -86,7 +103,8 @@ class LoginViewModel : ViewModel() {
             "uid" to user.uid,
             "name" to name,
             "email" to (user.email ?: ""),
-            "role" to "user"
+            "role" to "user",
+            "createdAt" to System.currentTimeMillis()
         )
 
         firestore.collection("users").document(user.uid).set(userData)
@@ -96,21 +114,20 @@ class LoginViewModel : ViewModel() {
                 triggerSuccessEvents()
             }
             .addOnFailureListener {
-                _loginState.value = AuthState.Error("Failed to create profile")
+                _loginState.value = AuthState.Error("Error al crear el perfil")
             }
     }
 
     private fun triggerSuccessEvents() {
         viewModelScope.launch {
-            _events.send(AuthEvent.ShowToast("Login Successful!"))
+            _events.send(AuthEvent.ShowToast("¡Inicio de sesión exitoso!"))
             _events.send(AuthEvent.Navigate("home"))
         }
     }
 
-    fun updateFcmToken() {
+    private fun updateFcmToken() {
         val uid = auth.currentUser?.uid ?: return
 
-        // Ensure you have imported com.google.firebase.messaging.FirebaseMessaging
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val token = task.result

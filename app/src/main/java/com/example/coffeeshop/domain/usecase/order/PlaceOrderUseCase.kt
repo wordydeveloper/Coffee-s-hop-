@@ -3,7 +3,6 @@ package com.example.coffeeshop.domain.usecase.order
 import com.example.coffeeshop.data.model.Order
 import com.example.coffeeshop.data.model.OrderStatus
 import com.example.coffeeshop.domain.repository.IOrderRepository
-
 class PlaceOrderUseCase(
     private val orderRepository: IOrderRepository
 ) {
@@ -16,7 +15,8 @@ class PlaceOrderUseCase(
             coffeeName = coffeeName,
             quantity = quantity,
             options = options,
-            status = OrderStatus.PENDING
+            status = OrderStatus.PENDING,
+            timestamp = System.currentTimeMillis()
         )
         orderRepository.insertOrder(order)
     }

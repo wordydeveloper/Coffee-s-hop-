@@ -7,10 +7,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -35,10 +35,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // ❌ Siempre cerrar sesión al iniciar la app
+        // 🚪 Siempre cerrar sesión al iniciar la app
+        // (si luego quieres recordar sesión, SOLO comentas esta línea)
         FirebaseAuth.getInstance().signOut()
 
-        // ⚡ Inicializar el módulo de dependencias (Room, etc.)
+        // Inicializar Room y demás dependencias
         AppModule.initializeDatabase(applicationContext)
 
         enableEdgeToEdge()
@@ -68,7 +69,6 @@ fun MyAppContent(
     seletedDestination: String,
     navegateTopLevelDestination: (AppToplevel) -> Unit
 ) {
-    // Rutas donde NO se muestra la BottomBar
     val noBottomBarRoutes = listOf(
         AppRoute.SPLASH,
         AppRoute.LOGIN,
@@ -115,7 +115,7 @@ fun MyAppContent(
                 favoriteScreen()
             }
             composable(AppRoute.PROFILE) {
-                profileScreen()
+                profileScreen(navController = navController)
             }
         }
     }

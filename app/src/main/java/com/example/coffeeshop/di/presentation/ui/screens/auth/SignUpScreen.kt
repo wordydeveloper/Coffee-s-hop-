@@ -48,24 +48,20 @@ fun SignupScreen(navController: NavController) {
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
 
-    // ✅ Configuramos GoogleSignInOptions y Client una sola vez
     val gso = remember {
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(context.getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
     }
-
     val googleSignInClient = remember {
         GoogleSignIn.getClient(context, gso)
     }
 
-    // ✅ Forzamos logout de Google al entrar a la pantalla
     LaunchedEffect(Unit) {
         googleSignInClient.signOut()
     }
 
-    // Google Sign-In launcher
     val googleSignInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -79,7 +75,6 @@ fun SignupScreen(navController: NavController) {
         }
     }
 
-    // Observer de eventos
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
@@ -112,7 +107,6 @@ fun SignupScreen(navController: NavController) {
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxWidth()
         ) {
-            // Logo
             Image(
                 painter = painterResource(id = R.drawable.imagen),
                 contentDescription = "Logo",
@@ -137,7 +131,6 @@ fun SignupScreen(navController: NavController) {
 
             Spacer(Modifier.height(24.dp))
 
-            // Name Field
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
@@ -149,7 +142,6 @@ fun SignupScreen(navController: NavController) {
 
             Spacer(Modifier.height(12.dp))
 
-            // Email Field
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
@@ -162,7 +154,6 @@ fun SignupScreen(navController: NavController) {
 
             Spacer(Modifier.height(12.dp))
 
-            // Password Field
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
@@ -184,7 +175,6 @@ fun SignupScreen(navController: NavController) {
 
             Spacer(Modifier.height(12.dp))
 
-            // Confirm Password Field
             OutlinedTextField(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it },
@@ -216,13 +206,16 @@ fun SignupScreen(navController: NavController) {
 
             Spacer(Modifier.height(24.dp))
 
-            // Signup Button
             Button(
                 onClick = {
                     if (password == confirmPassword) {
                         viewModel.signup(name, email, password)
                     } else {
-                        Toast.makeText(context, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            "Las contraseñas no coinciden",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 },
                 modifier = Modifier
@@ -242,11 +235,8 @@ fun SignupScreen(navController: NavController) {
 
             Spacer(Modifier.height(16.dp))
 
-            // Google Sign-In Button
             OutlinedButton(
-                onClick = {
-                    googleSignInLauncher.launch(googleSignInClient.signInIntent)
-                },
+                onClick = { googleSignInLauncher.launch(googleSignInClient.signInIntent) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
@@ -256,12 +246,10 @@ fun SignupScreen(navController: NavController) {
 
             Spacer(Modifier.height(16.dp))
 
-            // Login Link
             TextButton(onClick = { navController.navigate(AppRoute.LOGIN) }) {
                 Text("¿Ya tienes cuenta? Inicia sesión")
             }
 
-            // Error Message
             if (authState is AuthState.Error) {
                 Spacer(Modifier.height(16.dp))
                 Text(
