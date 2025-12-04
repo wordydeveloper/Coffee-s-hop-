@@ -6,6 +6,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.coffeeshop.MainScreen
 import com.example.coffeeshop.di.presentation.ui.screens.cart.CartScreen
+import com.example.coffeeshop.di.presentation.ui.screens.favorite.favoriteScreen
+import com.example.coffeeshop.di.presentation.ui.screens.profile.profileScreen
 import com.example.coffeeshop.di.presentation.ui.screens.search.SearchScreen
 import com.example.coffeeshop.ui.ui.splashScreen
 

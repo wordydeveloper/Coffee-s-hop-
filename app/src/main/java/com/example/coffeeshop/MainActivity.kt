@@ -24,8 +24,8 @@ import com.example.coffeeshop.di.AppModule
 import com.example.coffeeshop.di.presentation.ui.screens.auth.SignupScreen
 import com.example.coffeeshop.di.presentation.ui.screens.cart.CartScreen
 import com.example.coffeeshop.di.presentation.ui.screens.search.SearchScreen
-import com.example.coffeeshop.navegation.favoriteScreen
-import com.example.coffeeshop.navegation.profileScreen
+import com.example.coffeeshop.di.presentation.ui.screens.favorite.favoriteScreen
+import com.example.coffeeshop.di.presentation.ui.screens.profile.profileScreen
 import com.example.coffeeshop.ui.screens.auth.LoginScreen
 import com.example.coffeeshop.ui.ui.CoffeeshopTheme
 import com.example.coffeeshop.ui.ui.splashScreen

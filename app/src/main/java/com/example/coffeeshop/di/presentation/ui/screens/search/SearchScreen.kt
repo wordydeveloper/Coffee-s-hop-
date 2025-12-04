@@ -22,7 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.coffeeshop.navegation.ShoppingCart
-import com.example.coffeeshop.viewmodel.FavoriteViewModel
+import com.example.coffeeshop.di.presentation.ui.screens.favorite.FavoriteViewModel
 
 @Composable
 fun SearchScreen(navController: NavController) {

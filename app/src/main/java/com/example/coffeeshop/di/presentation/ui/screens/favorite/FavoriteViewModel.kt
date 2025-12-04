@@ -1,4 +1,4 @@
-package com.example.coffeeshop.viewmodel
+package com.example.coffeeshop.di.presentation.ui.screens.favorite
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -16,11 +16,11 @@ class FavoriteViewModel(application: Application) : AndroidViewModel(application
     val favorites: StateFlow<List<Favorite>>
 
     init {
-        val database = AppDatabase.getInstance(application)
+        val database = AppDatabase.Companion.getInstance(application)
         repository = AppRepository(database.orderDao(), database.favoriteDao())
         favorites = repository.favorites.stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Lazily,
+            started = SharingStarted.Companion.Lazily,
             initialValue = emptyList()
         )
     }

@@ -1,4 +1,4 @@
-package com.example.coffeeshop.navegation
+package com.example.coffeeshop.di.presentation.ui.screens.profile
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
