@@ -53,6 +53,9 @@ class CartViewModel(
     private val _uiState = MutableStateFlow<CartUiState>(CartUiState.Loading)
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
 
+    // Mapa interno para manejar cantidades localmente sin afectar el repositorio constantemente
+    private val _localQuantities = MutableStateFlow<Map<String, Int>>(emptyMap())
+
     init {
         loadCart()
     }
@@ -64,24 +67,31 @@ class CartViewModel(
                 combine(
                     getCartItemsUseCase(),
                     getCartTotalUseCase(),
-                    getAllOrdersUseCase()
-                ) { cartItems, total, orders ->
+                    getAllOrdersUseCase(),
+                    _localQuantities
+                ) { cartItems, total, orders, localQty ->
                     if (cartItems.isEmpty() && orders.isEmpty()) {
                         CartUiState.Empty
                     } else {
                         CartUiState.Success(
-                            items = cartItems.map { it.toCartItem() },
+                            items = cartItems.map {
+                                val item = it.toCartItem()
+                                // Usar cantidad local si existe, sino la del repositorio
+                                item.copy(quantity = localQty[item.id] ?: item.quantity)
+                            },
                             total = total,
                             orders = orders
                         )
                     }
+                }.catch { e ->
+                    Log.e(TAG, "Error en loadCart", e)
+                    emit(CartUiState.Error("Error al cargar: ${e.message}"))
                 }.collect { state ->
                     _uiState.value = state
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error al cargar el carrito", e)
-                _uiState.value =
-                    CartUiState.Error("Error al cargar el carrito: ${e.message}")
+                _uiState.value = CartUiState.Error("Error al cargar el carrito: ${e.message}")
             }
         }
     }
@@ -95,18 +105,20 @@ class CartViewModel(
                     if (itemToRemove != null) {
                         val coffee = com.example.coffeeshop.data.model.Coffee(
                             id = itemToRemove.id,
-                            imageRes = 0, // No necesitamos la imagen
+                            imageRes = 0,
                             name = itemToRemove.name,
                             description = "",
                             price = itemToRemove.price
                         )
                         removeFromCartUseCase(coffee)
+
+                        // Limpiar la cantidad local
+                        _localQuantities.value = _localQuantities.value - itemId
                     }
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error al eliminar del carrito", e)
-                _uiState.value =
-                    CartUiState.Error("Error al eliminar: ${e.message}")
+                _uiState.value = CartUiState.Error("Error al eliminar: ${e.message}")
             }
         }
     }
@@ -119,10 +131,14 @@ class CartViewModel(
                     return@launch
                 }
 
+                // Actualizar cantidad localmente de inmediato para UX fluida
+                _localQuantities.value = _localQuantities.value + (itemId to newQuantity)
+
                 val currentState = _uiState.value
                 if (currentState is CartUiState.Success) {
                     val item = currentState.items.find { it.id == itemId }
                     if (item != null) {
+                        // Actualizar en el repositorio
                         val cartItem = com.example.coffeeshop.data.model.CartItem(
                             coffee = com.example.coffeeshop.data.model.Coffee(
                                 id = item.id,
@@ -135,14 +151,12 @@ class CartViewModel(
                             addSugar = item.options.contains("azúcar"),
                             addMilk = item.options.contains("leche")
                         )
-                        // Actualizar usando el repositorio directamente
                         AppModule.cartRepository.updateCartItem(cartItem)
                     }
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error al actualizar cantidad", e)
-                _uiState.value =
-                    CartUiState.Error("Error al actualizar: ${e.message}")
+                _uiState.value = CartUiState.Error("Error al actualizar: ${e.message}")
             }
         }
     }
@@ -165,10 +179,7 @@ class CartViewModel(
                         ""
                     }
 
-                    Log.d(
-                        TAG,
-                        "Creando pedido en Firebase: ${item.name} x${item.quantity} [$options]"
-                    )
+                    Log.d(TAG, "Creando pedido en Firebase: ${item.name} x${item.quantity} [$options]")
 
                     placeOrderUseCase(
                         coffeeName = item.name,
@@ -177,14 +188,15 @@ class CartViewModel(
                     )
                 }
 
-                // Limpiar el carrito local
+                // Limpiar carrito y cantidades locales
                 clearCartUseCase()
+                _localQuantities.value = emptyMap()
+
                 Log.d(TAG, "Carrito limpiado después de checkout")
 
             } catch (e: Exception) {
                 Log.e(TAG, "Error en checkout", e)
-                _uiState.value =
-                    CartUiState.Error("Error al procesar el pedido: ${e.message}")
+                _uiState.value = CartUiState.Error("Error al procesar el pedido: ${e.message}")
             }
         }
     }
@@ -195,13 +207,12 @@ class CartViewModel(
                 val nextStatus = when (order.status) {
                     OrderStatus.PENDING -> OrderStatus.PREPARING
                     OrderStatus.PREPARING -> OrderStatus.READY
-                    OrderStatus.READY -> return@launch // Ya está listo
+                    OrderStatus.READY -> return@launch
                 }
                 updateOrderStatusUseCase(order.id, nextStatus)
             } catch (e: Exception) {
                 Log.e(TAG, "Error al avanzar estado", e)
-                _uiState.value =
-                    CartUiState.Error("Error al actualizar estado: ${e.message}")
+                _uiState.value = CartUiState.Error("Error al actualizar estado: ${e.message}")
             }
         }
     }
@@ -212,13 +223,11 @@ class CartViewModel(
                 updateOrderStatusUseCase(order.id, newStatus)
             } catch (e: Exception) {
                 Log.e(TAG, "Error al actualizar estado manualmente", e)
-                _uiState.value =
-                    CartUiState.Error("Error al actualizar estado: ${e.message}")
+                _uiState.value = CartUiState.Error("Error al actualizar estado: ${e.message}")
             }
         }
     }
 
-    // Mapper desde CartItem de dominio a CartItem de UI
     private fun com.example.coffeeshop.data.model.CartItem.toCartItem() = CartItem(
         id = coffee.id,
         name = coffee.name,

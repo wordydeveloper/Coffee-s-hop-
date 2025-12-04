@@ -1,0 +1,25 @@
+[33md8553f4[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m  fix (favoriteScreen) : Favorite UX improvement
+[33m651a060[m fix(Cart) : Firebase integration ready
+[33ma9507df[m fix (cartview) : integrando almacenamiento en la nube
+[33maadc004[m firx(google-sign): Correct implementation of Google login
+[33m58463d9[m firx(google-sign): correct implementation
+[33m3110297[m fix (google-services): implementation correct
+[33mf97af0a[m structural changes feat:(firebase) and integrated Firebase
+[33m2b402d1[m Merge branch 'firestore'
+[33m2a7f899[m[33m ([m[1;31morigin/firestore[m[33m, [m[1;32mfirestore[m[33m)[m cambios en lib versiones en firestore
+[33m1d03ffe[m cambios en libs version
+[33mf23a8b9[m frestore
+[33mc184094[m "cambios en CartScreen.kt"
+[33me54ca59[m Restructurando el proyecto
+[33m3529d2d[m "cambios de estructura"
+[33m8b27e51[m app lista
+[33m418d024[m Merge remote-tracking branch 'origin/main'
+[33me10bf63[m compontes listos
+[33m2545012[m compontes listos
+[33m93cd885[m Merge remote-tracking branch 'origin/main'
+[33m4dd6c09[m chore:navegacion
+[33m848add7[m chore:navegacion
+[33mdb7b07f[m pagos
+[33mbfee9ed[m primer commit
+[33me15ca91[m Initial commit bottom
+[33m499b41f[m imcoporando el navbottom
