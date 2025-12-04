@@ -1,4 +1,4 @@
-package com.example.coffeeshop.ui.screens.search
+package com.example.coffeeshop.di.presentation.ui.screens.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

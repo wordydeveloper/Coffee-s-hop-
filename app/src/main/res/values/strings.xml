@@ -1,10 +1,15 @@
 <resources>
     <string name="app_name">Coffeeshop</string>
 
+    <!-- Navegación inferior -->
     <string name="home">Home</string>
     <string name="search">SEARCH</string>
     <string name="shoppingCart">SHOPPINGCART</string>
     <string name="cart">Cart</string>
     <string name="favorite">Favorite</string>
     <string name="profile">Profile</string>
+
+    <!-- PARA GOOGLE SIGN-IN -->
+    <string name="default_web_client_id">dummy.apps.googleusercontent.com</string>
+
 </resources>

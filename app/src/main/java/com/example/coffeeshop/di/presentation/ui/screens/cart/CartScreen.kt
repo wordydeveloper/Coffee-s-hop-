@@ -1,4 +1,4 @@
-package com.example.coffeeshop.ui.screens.cart
+package com.example.coffeeshop.di.presentation.ui.screens.cart
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn

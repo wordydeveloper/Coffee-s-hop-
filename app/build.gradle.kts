@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-  id("org.jetbrains.kotlin.kapt")
+    id("org.jetbrains.kotlin.kapt")
     alias(libs.plugins.google.services)
 }
 
@@ -48,52 +48,78 @@ android {
 }
 
 dependencies {
-    // Add these for the new code to work:
+    // LiveData + Compose (para usar observeAsState con LiveData)
+    implementation("androidx.compose.runtime:runtime-livedata")
+
+    // =========================
+    // 🔥 Firebase + Google Sign-In
+    // =========================
+
+    // BOM de Firebase (maneja versiones por ti)
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
-    implementation("com.google.firebase:firebase-firestore")
 
-    // 3. Las otras librerías (TAMBIÉN SIN NÚMERO)
-    implementation("com.google.firebase:firebase-auth")
-    implementation("com.google.firebase:firebase-messaging")
+    // Firebase Auth, Firestore y Messaging (con KTX)
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-messaging-ktx")
 
-    // 🗄️ Room
-    implementation("androidx.room:room-runtime:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
-    implementation(libs.firebase.auth)
+    // Google Sign-In clásico (GoogleSignIn / GoogleSignInOptions)
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
+
+    // Credentials API & Google ID (si luego quieres usar el sistema nuevo)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+
+    // Crashlytics buildtools (si lo usas para simbolización, etc.)
     implementation(libs.firebase.crashlytics.buildtools)
-    implementation(libs.firebase.firestore.ktx)
+
+    // =========================
+    // 🗄️ Room
+    // =========================
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
 
+    // =========================
     // ⚙️ Coroutines
+    // =========================
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
-    // 🎨 Compose
-    implementation(platform("androidx.compose:compose-bom:2025.01.01"))
-    implementation("androidx.compose.material:material-icons-extended")
-    implementation("androidx.compose.material3:material3")
+    // =========================
+    // 🎨 Jetpack Compose
+    // =========================
 
-    // 🧭 AndroidX
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
+    // Usa SOLO el BOM definido en libs.versions.toml
     implementation(platform(libs.androidx.compose.bom))
+
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    // Material icons extendidos
+    implementation("androidx.compose.material:material-icons-extended")
+
+    // =========================
+    // 🧭 AndroidX / Navegación / Core
+    // =========================
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.benchmark.macro)
 
+    // =========================
     // 🧪 Test
+    // =========================
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }

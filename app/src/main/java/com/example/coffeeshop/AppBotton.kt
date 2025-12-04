@@ -10,59 +10,58 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 
-
-
-class MyAppNavigationActions(private val navController: NavHostController){
-    fun navigateto(destination: AppToplevel){
-        navController.navigate(destination.route){
-            popUpTo(navController.graph.findStartDestination().id){
-                saveState =true
+class MyAppNavigationActions(private val navController: NavHostController) {
+    fun navigateto(destination: AppToplevel) {
+        navController.navigate(destination.route) {
+            popUpTo(navController.graph.findStartDestination().id) {
+                saveState = true
             }
-            launchSingleTop= true
+            launchSingleTop = true
         }
     }
 }
-data class AppToplevel (
-    val route:String,
-    val selecIcon : ImageVector,
-    val IconText:Int
+
+data class AppToplevel(
+    val route: String,
+    val selecIcon: ImageVector,
+    val IconText: Int
 )
 
 val TopLevelDestination = listOf(
     AppToplevel(
-        route =AppRoute.HOME ,
+        route = AppRoute.HOME,
         selecIcon = Icons.Default.Home,
-        IconText =R.string.home
+        IconText = R.string.home
     ),
     AppToplevel(
-        route =AppRoute.SEARCH ,
+        route = AppRoute.SEARCH,
         selecIcon = Icons.Default.Search,
-        IconText =R.string.search
+        IconText = R.string.search
     ),
     AppToplevel(
-        route =AppRoute.SHOPPINGCART ,
+        route = AppRoute.SHOPPINGCART,
         selecIcon = Icons.Default.ShoppingCart,
-        IconText =R.string.shoppingCart
+        IconText = R.string.shoppingCart
     ),
     AppToplevel(
-        route =AppRoute.FAVORITE ,
+        route = AppRoute.FAVORITE,
         selecIcon = Icons.Default.Favorite,
-        IconText =R.string.favorite
+        IconText = R.string.favorite
     ),
     AppToplevel(
-        route =AppRoute.PROFILE ,
+        route = AppRoute.PROFILE,
         selecIcon = Icons.Default.Person,
-        IconText =R.string.profile
+        IconText = R.string.profile
     ),
+)
 
-    )
 object AppRoute {
     const val SPLASH = "splash"
+    const val LOGIN = "login"
+    const val SIGNUP = "signup"
     const val HOME = "home"
     const val SEARCH = "search"
     const val SHOPPINGCART = "shoppingCart"
     const val PROFILE = "profile"
     const val FAVORITE = "favorite"
-    const val LOGIN = "login"
-
 }

@@ -11,19 +11,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
-import com.example.coffeeshop.ui.screens.search.SearchScreen
+import com.example.coffeeshop.di.AppModule
+import com.example.coffeeshop.di.presentation.ui.screens.auth.SignupScreen
+import com.example.coffeeshop.di.presentation.ui.screens.cart.CartScreen
+import com.example.coffeeshop.di.presentation.ui.screens.search.SearchScreen
 import com.example.coffeeshop.navegation.favoriteScreen
 import com.example.coffeeshop.navegation.profileScreen
-import com.example.coffeeshop.ui.screens.cart.CartScreen
+import com.example.coffeeshop.ui.screens.auth.LoginScreen
+
 import com.example.coffeeshop.ui.ui.CoffeeshopTheme
 import com.example.coffeeshop.ui.ui.splashScreen
-
-
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // ⚡ IMPORTANTE: Inicializar el módulo de dependencias
+        AppModule.initializeDatabase(applicationContext)
+
         enableEdgeToEdge()
         setContent {
             CoffeeshopTheme {
@@ -32,19 +37,19 @@ class MainActivity : ComponentActivity() {
                     MyAppNavigationActions(navController)
                 }
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val selectedDestination = navBackStackEntry?.destination?.route ?: AppRoute.HOME
+                val selectedDestination = navBackStackEntry?.destination?.route ?: AppRoute.SPLASH
 
                 MyAppContent(
                     modifier = Modifier,
                     navController = navController,
                     seletedDestination = selectedDestination,
                     navegateTopLevelDestination = navigationActions::navigateto
-
                 )
             }
         }
     }
 }
+
 @Composable
 fun MyAppContent(
     modifier: Modifier,
@@ -52,10 +57,17 @@ fun MyAppContent(
     seletedDestination: String,
     navegateTopLevelDestination: (AppToplevel) -> Unit
 ) {
+    // Lista de rutas donde NO se muestra el BottomBar
+    val noBottomBarRoutes = listOf(
+        AppRoute.SPLASH,
+        AppRoute.LOGIN,
+        AppRoute.SIGNUP
+    )
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         bottomBar = {
-            if (seletedDestination != AppRoute.SPLASH) {
+            if (seletedDestination !in noBottomBarRoutes) {
                 ComposePreview(
                     seletedDestination = seletedDestination,
                     navegateTopLevelDestination = navegateTopLevelDestination
@@ -72,6 +84,12 @@ fun MyAppContent(
         ) {
             composable(AppRoute.SPLASH) {
                 splashScreen(navController)
+            }
+            composable(AppRoute.LOGIN) {
+                LoginScreen(navController)
+            }
+            composable(AppRoute.SIGNUP) {
+                SignupScreen(navController)
             }
             composable(AppRoute.HOME) {
                 MainScreen(navController = navController)
@@ -112,4 +130,3 @@ fun ComposePreview(
         }
     }
 }
-

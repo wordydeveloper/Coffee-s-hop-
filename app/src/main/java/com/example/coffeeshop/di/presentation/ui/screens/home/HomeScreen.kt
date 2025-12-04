@@ -1,4 +1,4 @@
-package com.example.coffeeshop.ui.screens.home
+package com.example.coffeeshop.di.presentation.ui.screens.home
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
