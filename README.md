@@ -60,3 +60,6 @@ Agregar el SHA-1 en Firebase → Project Settings.
 ./gradlew clean
 ./gradlew build
 ./gradlew installDebug
+
+#link del video explicativo
+https://youtu.be/UfjCm6KFKrA?si=E5AeT1s4hn8Z2Pya
