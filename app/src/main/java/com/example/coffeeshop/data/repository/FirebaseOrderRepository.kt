@@ -34,8 +34,9 @@ class FirebaseOrderRepository(
     override fun getAllOrders(): Flow<List<Order>> = callbackFlow {
         val userId = auth.currentUser?.uid
 
+        // ✅ IMPORTANTE: Verificar autenticación antes de consultar
         if (userId == null) {
-            Log.w(TAG, "Usuario no autenticado")
+            Log.w(TAG, "Usuario no autenticado, enviando lista vacía")
             trySend(emptyList())
             close()
             return@callbackFlow
@@ -202,7 +203,6 @@ class FirebaseOrderRepository(
     }
 
     // ==== Mappers ====
-
     private fun Order.toEntity() = OrderEntity(
         id = id,
         coffeeName = coffeeName,

@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
 
         // 🚪 Siempre cerrar sesión al iniciar la app
         // (si luego quieres recordar sesión, SOLO comentas esta línea)
-        FirebaseAuth.getInstance().signOut()
+        //FirebaseAuth.getInstance().signOut()
 
         // Inicializar Room y demás dependencias
         AppModule.initializeDatabase(applicationContext)

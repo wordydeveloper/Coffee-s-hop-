@@ -131,14 +131,14 @@ class CartViewModel(
                     return@launch
                 }
 
-                // Actualizar cantidad localmente de inmediato para UX fluida
+                // ✅ Actualizar UI inmediatamente para UX fluida
                 _localQuantities.value = _localQuantities.value + (itemId to newQuantity)
 
+                // ✅ Sincronizar con repositorio
                 val currentState = _uiState.value
                 if (currentState is CartUiState.Success) {
                     val item = currentState.items.find { it.id == itemId }
                     if (item != null) {
-                        // Actualizar en el repositorio
                         val cartItem = com.example.coffeeshop.data.model.CartItem(
                             coffee = com.example.coffeeshop.data.model.Coffee(
                                 id = item.id,
@@ -152,10 +152,11 @@ class CartViewModel(
                             addMilk = item.options.contains("leche")
                         )
                         AppModule.cartRepository.updateCartItem(cartItem)
+                        Log.d(TAG, "✅ Cantidad actualizada: ${item.name} x$newQuantity")
                     }
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Error al actualizar cantidad", e)
+                Log.e(TAG, "❌ Error al actualizar cantidad: ${e.message}", e)
                 _uiState.value = CartUiState.Error("Error al actualizar: ${e.message}")
             }
         }
